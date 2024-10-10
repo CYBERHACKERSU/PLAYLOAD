@@ -9,7 +9,7 @@ from keep_alive import keep_alive
 keep_alive()
 
 # Configuration
-TOKEN = "7001355572:AAFAqeNWStcmPry4Zap8u0LXZAAPS-5AVgc"  # Replace with your bot token
+TOKEN = "7686876035:AAE3elinps7uum6p76dvcyEggIiQIf1kGYE"  # Replace with your bot token
 ADMIN_IDS = [6906270448]  # Admin ID(s) as integers
 USER_FILE = "users.json"
 KEY_FILE = "keys.json"
@@ -171,12 +171,29 @@ def payload_command(message):
 
 
 
-# Function to generate random bytecode-like payload
+# Function to generate random bytecode-like payload with double quotes around every eighth
 def generate_payload(size_kb):
     size_bytes = size_kb * 1024
-    # Generate random bytes and represent them in a byte-like format
-    payload = bytearray(random.getrandbits(8) for _ in range(size_bytes))
-    return ''.join(f'\\x{byte:02x}' for byte in payload)
+    payload = []
+
+    for _ in range(size_bytes):
+        if random.choice([True, False]):
+            payload.append(random.getrandbits(8))  # Append random byte
+        else:
+            payload.append(ord('"'))  # Add a double quote
+
+    # Convert payload bytes to hex representation
+    hex_payload = ''.join(f'\\x{byte:02x}' for byte in payload)
+
+    # Split into eighths
+    eighth_length = len(hex_payload) // 8
+    lines = [hex_payload[i:i + eighth_length] for i in range(0, len(hex_payload), eighth_length)]
+
+    # Create formatted output
+    formatted_output = '\n'.join(f'"{line}"' for line in lines)
+
+    return formatted_output
+
 
 # Command handler for retrieving user info
 @bot.message_handler(commands=['myinfo'])
